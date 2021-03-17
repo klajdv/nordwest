@@ -1,27 +1,27 @@
 class PublicController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
 
   def index
-    @contact = Contact.new
-
+    @contact = Contact.new(params[:Contact])
   end
 
-  def new
-    @contact = Contact.new
-  end
 
   def create
-    @contact = Contact.new(params[:contact])
-    @contact.request = request
-    if @contact.deliver
-      flash.now[:notice] = 'Thank you for your message. We will contact you soon!'
-    else
-      flash.now[:error] = 'Cannot send message.'
-      render :new
-    end
-  end
+    @contact = Contact.new(params[:Contact])
 
-  def contact_attributes
-    params.require(:Contacts).permit(:name,:email,:subject,:message)
+    @contact.request = request
+    respond_to do |format|
+      if @contact.deliver
+        # re-initialize Home object for cleared form
+        @contact = Contact.new
+        format.html { render 'index'}
+        format.js   { flash.now[:success] = @message = "Thank you for your message. I'll get back to you soon!" }
+      else
+        format.html { render 'index' }
+        format.js   { flash.now[:error] = @message = "Message did not send." }
+      end
+    end
   end
 
 

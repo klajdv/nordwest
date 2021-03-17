@@ -8,6 +8,6 @@ class ContactMailer < ApplicationMailer
   def contact
     @contact = Contact.new
 
-    mail to: "to@example.org"
+    mail to: "nordwestlogistik1@gmail.com"
   end
 end
